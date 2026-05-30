@@ -128,7 +128,7 @@ export default function Index() {
               <Icon name="Printer" size={20} className="text-brand-navy" />
             </div>
             <span className="font-oswald text-xl font-bold text-white tracking-wide">
-              ПОЛИГРАФ<span className="text-brand-accent">ОПТ</span>
+              ПОЛИ<span className="text-brand-accent">ГРАД</span>
             </span>
           </button>
 
@@ -536,7 +536,7 @@ export default function Index() {
               <Icon name="Printer" size={14} className="text-brand-navy" />
             </div>
             <span className="font-oswald font-bold text-white tracking-wide">
-              ПОЛИГРАФ<span className="text-brand-accent">ОПТ</span>
+              ПОЛИ<span className="text-brand-accent">ГРАД</span>
             </span>
           </div>
           <p className="text-white/30 text-sm">© 2026 ПолиграфОпт. Все права защищены.</p>
