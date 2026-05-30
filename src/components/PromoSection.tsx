@@ -280,7 +280,7 @@ export default function PromoSection({ countdown, onScrollTo }: PromoSectionProp
               ПОЛИ<span className="text-brand-accent">ГРАД</span>
             </span>
           </div>
-          <p className="text-white/30 text-sm">© 2026 ПолиграфОпт. Все права защищены.</p>
+          <p className="text-white/30 text-sm">© 2026 Полиград. Все права защищены.</p>
           <div className="flex flex-wrap gap-5 justify-center">
             {NAV.map((n) => (
               <button
