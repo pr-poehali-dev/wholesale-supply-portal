@@ -1,5 +1,8 @@
+import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import { NEWS, NAV } from "@/lib/siteData";
+
+const SEND_LEAD_URL = "https://functions.poehali.dev/5b371f74-aec0-4c03-bdc4-d095660ee983";
 
 interface CountdownTime {
   d: number;
@@ -24,7 +27,35 @@ interface PromoSectionProps {
   onScrollTo: (id: string) => void;
 }
 
+type FormStatus = "idle" | "loading" | "success" | "error";
+
 export default function PromoSection({ countdown, onScrollTo }: PromoSectionProps) {
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<FormStatus>("idle");
+
+  const handleSubmit = async () => {
+    if (!name.trim() || !contact.trim()) return;
+    setStatus("loading");
+    try {
+      const res = await fetch(SEND_LEAD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contact, message }),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setName("");
+        setContact("");
+        setMessage("");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
   return (
     <>
       {/* АКЦИИ */}
@@ -154,27 +185,64 @@ export default function PromoSection({ countdown, onScrollTo }: PromoSectionProp
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="anim-hidden bg-white/5 border border-white/10 rounded-3xl p-8">
               <h3 className="font-oswald text-2xl font-bold text-white mb-6">Оставьте заявку</h3>
-              <div className="space-y-4">
-                <input
-                  className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm"
-                  placeholder="Название компании или ваше имя"
-                />
-                <input
-                  className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm"
-                  placeholder="Телефон или e-mail"
-                />
-                <textarea
-                  rows={4}
-                  className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm resize-none"
-                  placeholder="Что вас интересует? Укажите нужные материалы и объёмы"
-                />
-                <button className="btn-glow w-full bg-brand-accent text-brand-navy font-oswald font-bold py-4 rounded-xl uppercase tracking-wide text-base">
-                  Отправить заявку
-                </button>
-                <p className="text-white/35 text-xs text-center">
-                  Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
-                </p>
-              </div>
+
+              {status === "success" ? (
+                <div className="flex flex-col items-center gap-4 py-10 text-center">
+                  <div className="w-16 h-16 rounded-full bg-brand-accent/20 flex items-center justify-center">
+                    <Icon name="CheckCircle" size={32} className="text-brand-accent" />
+                  </div>
+                  <h4 className="font-oswald text-xl font-bold text-white">Заявка отправлена!</h4>
+                  <p className="text-white/60 text-sm">Мы свяжемся с вами в ближайшее время.</p>
+                  <button
+                    onClick={() => setStatus("idle")}
+                    className="text-brand-accent text-sm underline underline-offset-4 hover:text-white transition-colors"
+                  >
+                    Отправить ещё одну
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm"
+                    placeholder="Название компании или ваше имя"
+                  />
+                  <input
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm"
+                    placeholder="Телефон или e-mail"
+                  />
+                  <textarea
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full bg-white/8 border border-white/15 rounded-xl px-5 py-3.5 text-white placeholder:text-white/35 focus:outline-none focus:border-brand-accent transition-colors text-sm resize-none"
+                    placeholder="Что вас интересует? Укажите нужные материалы и объёмы"
+                  />
+                  {status === "error" && (
+                    <p className="text-red-400 text-sm text-center">Ошибка отправки. Попробуйте ещё раз.</p>
+                  )}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={status === "loading" || !name.trim() || !contact.trim()}
+                    className="btn-glow w-full bg-brand-accent text-brand-navy font-oswald font-bold py-4 rounded-xl uppercase tracking-wide text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {status === "loading" ? (
+                      <>
+                        <Icon name="Loader" size={18} className="animate-spin" />
+                        Отправляем...
+                      </>
+                    ) : (
+                      "Отправить заявку"
+                    )}
+                  </button>
+                  <p className="text-white/35 text-xs text-center">
+                    Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="anim-hidden space-y-5">
